@@ -13,3 +13,9 @@
 [submodule "contrib/numactl"]
 	path = contrib/numactl
 	url = https://github.com/numactl/numactl.git
+[submodule "contrib/args-parser"]
+	path = contrib/args-parser
+	url = https://github.com/igormironchik/args-parser.git
+[submodule "contrib/thrift"]
+	path = contrib/thrift
+	url = https://github.com/apache/thrift.git
