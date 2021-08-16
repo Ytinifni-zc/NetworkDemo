@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -ldl")
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/contrib)
+include_directories(${CMAKE_SOURCE_DIR}/src)
 
 include(${CMAKE_SOURCE_DIR}/cmake/find_jemalloc.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/arch.cmake)
@@ -21,6 +22,14 @@ if(NOT TARGET spdlog)
     # Stand-alone build
     find_package(spdlog REQUIRED)
 endif()
+
+set(CUSTOM_THRIFT_LIB thrift)
+list(APPEND CUSTOM_THRIFT_INCLUDE_DIR
+        "${CMAKE_SOURCE_DIR}/src/ThriftRPC/gen-cpp "
+        "${CMAKE_SOURCE_DIR}/contrib/thrift/lib/cpp/src "
+        "${CMAKE_SOURCE_DIR}/../build/contrib/thrift ")
+
 add_subdirectory(utils)
+add_subdirectory(src)
 add_subdirectory(tests)
 

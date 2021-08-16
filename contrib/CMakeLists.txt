@@ -20,3 +20,4 @@ set(WITH_QT5 OFF)
 set(WITH_OPENSSL OFF)
 set(BUILD_EXAMPLES ON)
 add_subdirectory(thrift)
+
