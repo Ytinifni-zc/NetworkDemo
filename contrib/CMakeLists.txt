@@ -1,9 +1,9 @@
 set(SPDLOG_BUILD_SHARED 1)
 
 add_subdirectory(fmt)
-add_subdirectory(jemalloc-cmake)
+#add_subdirectory(jemalloc-cmake)
 add_subdirectory(spdlog)
-add_subdirectory(numactl-cmake)
+#add_subdirectory(numactl-cmake)
 
 # add thrift
 set(BUILD_TESTING OFF)
