@@ -1,12 +1,12 @@
-if (NOT EXISTS ${THRIFT_COMPILER})
-    #    set(THRIFT_COMPILER $<TARGET_FILE:thrift-compiler>)
-    set(THRIFT_COMPILER )
-endif ()
-
-add_custom_command(
-        OUTPUT gen-cpp/TestProto.cpp
-        COMMAND ${THRIFT_COMPILER} --gen cpp -r frontier.thrift
-)
+# if (NOT EXISTS ${THRIFT_COMPILER})
+#         set(THRIFT_COMPILER $<TARGET_FILE:thrift-compiler>)
+# #    set(THRIFT_COMPILER )
+# endif ()
+#
+# add_custom_command(
+#         OUTPUT gen-cpp/TestProto.cpp
+#         COMMAND ${THRIFT_COMPILER} --gen cpp -r frontier.thrift
+# )
 include_directories("${CMAKE_SOURCE_DIR}/src/ThriftRPC/gen-cpp")
 include_directories("${CMAKE_SOURCE_DIR}/contrib/thrift/lib/cpp/src")
 include_directories("${CMAKE_SOURCE_DIR}/build/contrib/thrift/lib/cpp")

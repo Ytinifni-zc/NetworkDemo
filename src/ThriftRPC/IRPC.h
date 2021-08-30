@@ -20,8 +20,10 @@
 
 #include <RPCConfig.h>
 #include <utils/Log.h>
+#include <utils/Type.h>
+#include <utils/StopWatch.h>
 
-namespace thriftRPC {
+namespace ThriftRPC {
     using namespace apache::thrift;
     using namespace apache::thrift::concurrency;
     using namespace apache::thrift::protocol;
@@ -57,7 +59,7 @@ namespace thriftRPC {
         void asyncRun() {
             apache::thrift::concurrency::ThreadFactory factory;
             factory.setDetached(false);
-            std::shared_ptr <apache::thrift::concurrency::Runnable> serverThreadRunner(server);
+            std::shared_ptr<apache::thrift::concurrency::Runnable> serverThreadRunner(server);
             thread = factory.newThread(serverThreadRunner);
             thread->start();
         }
@@ -65,10 +67,10 @@ namespace thriftRPC {
         virtual ~IRPCServer() { stop(); }
 
     protected:
-        std::shared_ptr <TThreadedServer> server;
+        std::shared_ptr<TThreadedServer> server;
 
     private:
-        std::shared_ptr <apache::thrift::concurrency::Thread> thread;
+        std::shared_ptr<apache::thrift::concurrency::Thread> thread;
     };
 
     class IRPCClient {
@@ -90,11 +92,9 @@ namespace thriftRPC {
                     is_open = false;
                     retry_times++;
                     if (retry_limit == retry_times)
-                        throw Exception(
-                                "Connection to (" + host + ":" + std::to_string(port) + ") refused. Retry " +
-                                std::to_string(retry_limit)
-                                + " times. " + String(tx.what()),
-                                ErrorCodes::RPC_CLIENT_CONNECTION_REFUSED);
+                        throw "Connection to (" + host + ":" + std::to_string(port) + ") refused. Retry " +
+                              std::to_string(retry_limit)
+                              + " times. " + String(tx.what());
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(RETRY_CONNECT_TIME_OUT));
             }
@@ -114,10 +114,10 @@ namespace thriftRPC {
         virtual ~IRPCClient() = default;
 
     protected:
-        std::shared_ptr <TProtocol> protocol;
+        std::shared_ptr<TProtocol> protocol;
 
     private:
-        std::shared_ptr <TTransport> socket;
-        std::shared_ptr <TTransport> transport;
+        std::shared_ptr<TTransport> socket;
+        std::shared_ptr<TTransport> transport;
     };
 }
