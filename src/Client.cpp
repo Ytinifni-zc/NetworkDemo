@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
         LOG::info("Request time: 0");
         LOG::info("Remote time: {}us", (remote_time - request_time) / 1000);
         LOG::info("Response time: {}us", (response_time - remote_time) / 1000);
-        LOG::info("Total elapse: {}ms", w.elapsedMilliseconds());
+        LOG::info("Total elapse: {}us", w.elapsedMicroseconds());
 
     }
 

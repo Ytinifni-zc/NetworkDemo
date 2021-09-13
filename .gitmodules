@@ -19,3 +19,15 @@
 [submodule "contrib/thrift"]
 	path = contrib/thrift
 	url = https://github.com/apache/thrift.git
+[submodule "contrib/incubator-brpc"]
+	path = contrib/incubator-brpc
+	url = https://github.com/apache/incubator-brpc.git
+[submodule "contrib/leveldb"]
+	path = contrib/leveldb
+	url = https://github.com/google/leveldb.git
+[submodule "contrib/gflags"]
+	path = contrib/gflags
+	url = https://github.com/gflags/gflags.git
+[submodule "contrib/protobuf"]
+	path = contrib/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

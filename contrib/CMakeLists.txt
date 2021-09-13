@@ -21,3 +21,43 @@ set(WITH_OPENSSL OFF)
 set(BUILD_EXAMPLES ON)
 add_subdirectory(thrift)
 
+set(USE_INTERNAL_LEVELDB_LIBRARY ON)
+set(USE_INTERNAL_GFLAGS_LIBRARY ON)
+set(USE_INTERNAL_PROTOBUF_LIBRARY ON)
+set(USE_INTERNAL_BRPC_LIBRARY ON)
+
+if (APPLE)
+    set(BUILD_DIR ${CMAKE_SOURCE_DIR}/cmake-build-debug)
+else()
+    set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
+endif()
+
+if (USE_INTERNAL_LEVELDB_LIBRARY)
+    add_subdirectory(leveldb)
+    set(LEVELDB_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/contrib/leveldb/include)
+    set(LEVELDB_LIB ${BUILD_DIR}/contrib/leveldb/libleveldb.a)
+endif ()
+
+if (USE_INTERNAL_GFLAGS_LIBRARY)
+    set(BUILD_SHARED_LIBS 1)
+    set(BUILD_STATIC_LIBS 1)
+    add_subdirectory(gflags)
+    set(GFLAGS_INCLUDE_PATH ${BUILD_DIR}/contrib/gflags/include)
+    set(GFLAGS_LIBRARY ${BUILD_DIR}/contrib/gflags/libgflags_nothread.so)
+endif ()
+
+if (USE_INTERNAL_PROTOBUF_LIBRARY)
+    if (MAKE_STATIC_LIBRARIES)
+        set(protobuf_BUILD_SHARED_LIBS OFF CACHE INTERNAL "" FORCE)
+    else ()
+        set(protobuf_BUILD_SHARED_LIBS ON CACHE INTERNAL "" FORCE)
+    endif ()
+    set(protobuf_WITH_ZLIB 0 CACHE INTERNAL "" FORCE) # actually will use zlib, but skip find
+    set(protobuf_BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
+    add_subdirectory(protobuf/cmake)
+endif ()
+
+if (USE_INTERNAL_BRPC_LIBRARY)
+    add_subdirectory(incubator-brpc)
+endif ()
+
