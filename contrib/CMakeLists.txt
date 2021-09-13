@@ -59,5 +59,8 @@ endif()
 
 if (USE_INTERNAL_BRPC_LIBRARY)
     add_subdirectory(incubator-brpc)
+    set(BRPC_PATH ${BUILD_DIR}/contrib/incubator-brpc/output)
+    set(BRPC_INCLUDE_PATH ${BRPC_PATH}/include)
+    set(BRPC_LIB_PATH ${BRPC_PATH}/lib)
 endif ()
 

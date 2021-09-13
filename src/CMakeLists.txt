@@ -1,4 +1,5 @@
 add_subdirectory(ThriftRPC)
+add_subdirectory(bRPC)
 
 add_executable(Server Server.h Server.cpp)
 target_link_libraries(Server PRIVATE my_thrift)
