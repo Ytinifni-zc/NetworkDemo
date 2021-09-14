@@ -4,12 +4,12 @@
 
 #include <args-parser/args-parser/all.hpp>
 
-#include "Client.h"
+#include "Common.h"
 
 int main(int argc, char *argv[]) {
     using namespace ThriftRPC;
 
-    std::locale::global(std::locale("en_US.UTF-8"));
+//    std::locale::global(std::locale("en_US.UTF-8"));
     LOG::set_pattern("[%^%l%$] %v");
 
     Args::CmdLine cmd(argc, argv);
@@ -20,6 +20,10 @@ int main(int argc, char *argv[]) {
     cmd.addArg(host_);
     Args::Arg port_('p', "port", true, false);
     cmd.addArg(port_);
+    Args::Arg proto_('t', "proto", true, false);
+    cmd.addArg(proto_);
+    Args::Arg attachment_('a', "attachment", true, false);
+    cmd.addArg(attachment_);
 
     cmd.parse();
 
@@ -32,39 +36,59 @@ int main(int argc, char *argv[]) {
     if (log_level == 't')
         LOG::set_level(LOG::level::trace);
 
+    auto proto = proto_.isDefined()? getProto(proto_.value()) : Proto::Thrift;
+
     String host = host_.isDefined() ? host_.value() : "127.0.0.1";
     auto port = port_.isDefined() ? std::stoi(port_.value()) : 38888;
+    auto attachment = attachment_.isDefined()? attachment_.value() : "";
 
-    TestProtoRPCClient client(host, port);
-    clockid_t cid{CLOCK_MONOTONIC};
-    {
-        Stopwatch w;
-        auto request_time = StopWatchDetail::nanoseconds(cid);
-        auto remote_time = client.remoteTime();
-        auto response_time = StopWatchDetail::nanoseconds(cid);
+    LOG::info("Proto: {} port: {}", proto, port);
 
-        LOG::info("Request time: 0");
-        LOG::info("Remote time: {}us", (remote_time - request_time) / 1000);
-        LOG::info("Response time: {}us", (response_time - remote_time) / 1000);
-        LOG::info("Total elapse: {}us", w.elapsedMicroseconds());
+    switch (proto) {
+        case Proto::Thrift:
+        {
+            TestProtoRPCClient client(host, port);
+            clockid_t cid{CLOCK_MONOTONIC};
+            {
+                Stopwatch w;
+                auto request_time = StopWatchDetail::nanoseconds(cid);
+                auto remote_time = client.remoteTime();
+                auto response_time = StopWatchDetail::nanoseconds(cid);
 
+                LOG::info("Request time: 0");
+                LOG::info("Remote time: {}us", (remote_time - request_time) / 1000);
+                LOG::info("Response time: {}us", (response_time - remote_time) / 1000);
+                LOG::info("Total elapse: {}us", w.elapsedMicroseconds());
+
+            }
+
+            {
+                Stopwatch w;
+                auto request_time = StopWatchDetail::nanoseconds(cid);
+                String data;
+                client.send(data);
+                LOG::trace("Receive remote data size: {}", data.size());
+                LOG::info("Receive elapse: {}us", w.elapsedMicroseconds());
+                auto remote_time = *(UInt64*)data.data();
+                auto response_time = StopWatchDetail::nanoseconds(cid);
+
+                LOG::info("Request time: 0");
+                LOG::info("Remote time: {}us", (remote_time - request_time) / 1000);
+                LOG::info("Response time: {}us", (response_time - remote_time) / 1000);
+                LOG::info("Total elapse: {}ms", w.elapsedMilliseconds());
+            }
+        }
+            break;
+        case Proto::bRPC:
+        {
+            std::stringstream ss("");
+            ss << host << ":" << std::to_string(port);
+            String server = ss.str();
+            examplebrpc::bRPCClient(server, attachment);
+        }
+            break;
     }
 
-    {
-        Stopwatch w;
-        auto request_time = StopWatchDetail::nanoseconds(cid);
-        String data;
-        client.send(data);
-        LOG::trace("Receive remote data size: {}", data.size());
-        LOG::info("Receive elapse: {}us", w.elapsedMicroseconds());
-        auto remote_time = *(UInt64*)data.data();
-        auto response_time = StopWatchDetail::nanoseconds(cid);
-
-        LOG::info("Request time: 0");
-        LOG::info("Remote time: {}us", (remote_time - request_time) / 1000);
-        LOG::info("Response time: {}us", (response_time - remote_time) / 1000);
-        LOG::info("Total elapse: {}ms", w.elapsedMilliseconds());
-    }
 
     return 0;
 }

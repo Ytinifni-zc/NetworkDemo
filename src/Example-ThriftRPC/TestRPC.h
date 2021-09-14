@@ -57,7 +57,7 @@ namespace ThriftRPC {
                 return ret;
             }
             catch (TException &tx) {
-                throw "[ThriftRPC] remoteTime() Error: " + String(tx.what());
+                throw "[Example-ThriftRPC] remoteTime() Error: " + String(tx.what());
             }
         }
 
@@ -69,7 +69,7 @@ namespace ThriftRPC {
                 transportClose();
             }
             catch (TException &tx) {
-                throw "[ThriftRPC] send(String&) Error: " + String(tx.what());
+                throw "[Example-ThriftRPC] send(String&) Error: " + String(tx.what());
             }
         }
 

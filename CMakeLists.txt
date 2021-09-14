@@ -33,6 +33,26 @@ list(APPEND CUSTOM_THRIFT_INCLUDE_DIR
         "${CMAKE_SOURCE_DIR}/build/contrib/thrift/lib/cpp "
         "${CMAKE_SOURCE_DIR}/cmake-build-relwithdebinfo/contrib/thrift/lib/cpp ")
 
+if (APPLE)
+    set(BUILD_DIR ${CMAKE_SOURCE_DIR}/cmake-build-debug)
+else()
+    set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
+endif()
+
+if (USE_INTERNAL_BRPC_LIBRARY)
+    set(BRPC_PATH ${BUILD_DIR}/contrib/incubator-brpc/output)
+    set(BRPC_LIB_PATH ${BRPC_PATH}/lib)
+    list(APPEND BRPC_INCLUDE_PATH
+            "${BRPC_PATH}/include"
+            "${CMAKE_SOURCE_DIR}/contrib/incubator-brpc/src")
+endif ()
+
+#if (APPLE)
+    include_directories($ENV{HOME}/local/include)
+#else()
+#    include_directories(/home/amos/)
+#endif()
+
 add_subdirectory(utils)
 add_subdirectory(src)
 #add_subdirectory(tests)

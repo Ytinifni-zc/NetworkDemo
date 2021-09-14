@@ -4,12 +4,12 @@
 
 #include <args-parser/args-parser/all.hpp>
 
-#include "Server.h"
+#include "Common.h"
 
 int main(int argc, char *argv[]) {
     using namespace ThriftRPC;
 
-    std::locale::global(std::locale("en_US.UTF-8"));
+//    std::locale::global(std::locale("en_US.UTF-8"));
     LOG::set_pattern("[%^%l%$] %v");
 
     Args::CmdLine cmd(argc, argv);
@@ -18,6 +18,11 @@ int main(int argc, char *argv[]) {
     cmd.addArg(log_level_);
     Args::Arg port_('p', "port", true, false);
     cmd.addArg(port_);
+    Args::Arg proto_('t', "proto", true, false);
+    cmd.addArg(proto_);
+    Args::Arg attachment_('a', false, false);
+    cmd.addArg(attachment_);
+
 
     cmd.parse();
 
@@ -32,7 +37,24 @@ int main(int argc, char *argv[]) {
 
     auto port = port_.isDefined()? std::stoi(port_.value()) : 38888;
 
-    TestProtoRPCServer server(port);
-    server.asyncRun();
+    auto proto = proto_.isDefined()? getProto(proto_.value()) : Proto::Thrift;
+
+    auto attachment = attachment_.isDefined();
+
+    LOG::info("Proto: {} port: {}", proto, port);
+
+    switch (proto) {
+        case Proto::Thrift:
+        {
+            TestProtoRPCServer server(port);
+            server.asyncRun();
+        }
+            break;
+        case Proto::bRPC:
+        {
+            examplebrpc::startBRPCServer(port, attachment);
+        }
+            break;
+    }
     return 0;
 }
