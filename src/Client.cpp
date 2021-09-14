@@ -24,6 +24,12 @@ int main(int argc, char *argv[]) {
     cmd.addArg(proto_);
     Args::Arg attachment_('a', "attachment", true, false);
     cmd.addArg(attachment_);
+    Args::Arg request_size_('r', "request_size", true, false);
+    cmd.addArg(request_size_);
+    Args::Arg use_bthread_("use_bthread", false);
+    cmd.addArg(use_bthread_);
+    Args::Arg thread_num_("thread_num", true, false);
+    cmd.addArg(thread_num_);
 
     cmd.parse();
 
@@ -36,17 +42,19 @@ int main(int argc, char *argv[]) {
     if (log_level == 't')
         LOG::set_level(LOG::level::trace);
 
-    auto proto = proto_.isDefined()? getProto(proto_.value()) : Proto::Thrift;
+    auto proto = proto_.isDefined() ? getProto(proto_.value()) : Proto::Thrift;
 
     String host = host_.isDefined() ? host_.value() : "127.0.0.1";
     auto port = port_.isDefined() ? std::stoi(port_.value()) : 38888;
-    auto attachment = attachment_.isDefined()? attachment_.value() : "";
+    auto attachment = attachment_.isDefined() ? attachment_.value() : "";
+    auto request_size = request_size_.isDefined() ? std::stol(request_size_.value()) : 0l;
+    auto use_bthread = use_bthread_.isDefined();
+    auto thread_num = thread_num_.isDefined() ? std::stoi(thread_num_.value()) : 1;
 
     LOG::info("Proto: {} port: {}", proto, port);
 
     switch (proto) {
-        case Proto::Thrift:
-        {
+        case Proto::Thrift: {
             TestProtoRPCClient client(host, port);
             clockid_t cid{CLOCK_MONOTONIC};
             {
@@ -69,7 +77,7 @@ int main(int argc, char *argv[]) {
                 client.send(data);
                 LOG::trace("Receive remote data size: {}", data.size());
                 LOG::info("Receive elapse: {}us", w.elapsedMicroseconds());
-                auto remote_time = *(UInt64*)data.data();
+                auto remote_time = *(UInt64 *) data.data();
                 auto response_time = StopWatchDetail::nanoseconds(cid);
 
                 LOG::info("Request time: 0");
@@ -79,12 +87,13 @@ int main(int argc, char *argv[]) {
             }
         }
             break;
-        case Proto::bRPC:
-        {
+        case Proto::bRPC: {
             std::stringstream ss("");
             ss << host << ":" << std::to_string(port);
             String server = ss.str();
-            examplebrpc::bRPCClient(server, attachment);
+            examplebrpc::bRPCClient(server, attachment, "baidu_std", "",
+                                    "", 100, 3, 1000, false,
+                                    0, request_size, -1, use_bthread, thread_num);
         }
             break;
     }

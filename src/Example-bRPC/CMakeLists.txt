@@ -14,3 +14,12 @@ target_include_directories(my_brpc PUBLIC ${BRPC_INCLUDE_PATH})
 target_include_directories(my_brpc PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 target_link_directories(my_brpc PUBLIC ${BRPC_LIB_PATH})
 target_link_libraries(my_brpc PUBLIC brpc spdlog)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/key.pem
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/cert.pem
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/key.pem
+        DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/cert.pem
+        DESTINATION ${CMAKE_BINARY_DIR})

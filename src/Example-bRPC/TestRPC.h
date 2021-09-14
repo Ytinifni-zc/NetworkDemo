@@ -99,6 +99,8 @@ namespace examplebrpc {
     std::string g_request;
     std::string g_attachment;
 
+    bool dont_fail{false};
+
     void *sender(void *arg) {
         // Normally, you should not call a Channel directly, but instead construct
         // a stub Service wrapping it. stub can be shared by all threads as well.
@@ -125,8 +127,8 @@ namespace examplebrpc {
                 g_latency_recorder << cntl.latency_us();
             } else {
                 g_error_count << 1;
-//                    CHECK(brpc::IsAskedToQuit() || !dont_fail)
-                CHECK(brpc::IsAskedToQuit())
+                    CHECK(brpc::IsAskedToQuit() || !dont_fail)
+//                CHECK(brpc::IsAskedToQuit())
                 << "error=" << cntl.ErrorText() << " latency=" << cntl.latency_us();
                 // We can't connect to the server, sleep a while. Notice that this
                 // is a specific sleeping to prevent this thread from spinning too
@@ -142,7 +144,7 @@ namespace examplebrpc {
                     const String &protocol = "baidu_std", const String &connection_type = "",
                     const String &load_balancer = "", int timeout_ms = 100,
                     int max_retry = 3, int interval_ms = 1000, bool enable_ssl = false, long attachment_size = 0,
-                    long request_size = 0, int dummy_port = 0, bool use_bthread = true, int thread_num = 1) {
+                    long request_size = 16, int dummy_port = -1, bool use_bthread = true, int thread_num = 50) {
 
         brpc::Channel channel;
         brpc::ChannelOptions options;
@@ -164,7 +166,7 @@ namespace examplebrpc {
         }
         if (request_size <= 0) {
             LOG::error("Bad request_size={}", request_size);
-            return;
+            exit(1);
         }
         g_request.resize(request_size, 'r');
 
@@ -178,8 +180,8 @@ namespace examplebrpc {
             pids.resize(thread_num);
             for (int i = 0; i < thread_num; ++i) {
                 if (pthread_create(&pids[i], NULL, sender, &channel) != 0) {
-                    LOG(ERROR) << "Fail to create pthread";
-                    return;
+                    LOG::error("Fail to create pthread");
+                    exit(1);
                 }
             }
         } else {
@@ -187,19 +189,19 @@ namespace examplebrpc {
             for (int i = 0; i < thread_num; ++i) {
                 if (bthread_start_background(
                         &bids[i], NULL, sender, &channel) != 0) {
-                    LOG(ERROR) << "Fail to create bthread";
-                    return;
+                    LOG::error("Fail to create pthread");
+                    exit(1);
                 }
             }
         }
 
         while (!brpc::IsAskedToQuit()) {
             sleep(1);
-            LOG(INFO) << "Sending EchoRequest at qps=" << g_latency_recorder.qps(1)
-                      << " latency=" << g_latency_recorder.latency(1);
+            LOG::info("Sending EchoRequest at qps={} latency={}", g_latency_recorder.qps(1),
+                      g_latency_recorder.latency(1));
         }
 
-        LOG(INFO) << "EchoClient is going to quit";
+        LOG::info("EchoClient is going to quit");
         for (int i = 0; i < thread_num; ++i) {
             if (!use_bthread) {
                 pthread_join(pids[i], NULL);
@@ -208,6 +210,5 @@ namespace examplebrpc {
             }
         }
 
-        LOG::info("EchoClient is goint to quit");
     }
 }

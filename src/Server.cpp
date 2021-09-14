@@ -24,8 +24,8 @@ int main(int argc, char *argv[]) {
     cmd.addArg(attachment_);
     Args::Arg is_response_('b', "is_response", false, false);
     cmd.addArg(is_response_);
-    Args::Arg idle_timeout_s_("timeout", true, false);
-    cmd.addArg(idle_timeout_s_);
+//    Args::Arg idle_timeout_s_("timeout", true, false);
+//    cmd.addArg(idle_timeout_s_);
     Args::Arg max_concurrency_("max_c", true, false);
     cmd.addArg(max_concurrency_);
     Args::Arg internal_port_("internal_port", true, false);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     auto proto = proto_.isDefined()? getProto(proto_.value()) : Proto::Thrift;
     auto attachment = attachment_.isDefined();
     auto is_response = is_response_.isDefined();
-    auto idle_timeout_s = idle_timeout_s_.isDefined()? std::stoi(idle_timeout_s_.value()) : -1;
+//    auto idle_timeout_s = idle_timeout_s_.isDefined()? std::stoi(idle_timeout_s_.value()) : -1;
     auto max_concurrency = max_concurrency_.isDefined()? std::stoi(max_concurrency_.value()) : -1;
     auto internal_port = internal_port_.isDefined()? std::stoi(internal_port_.value()) : -1;
 
